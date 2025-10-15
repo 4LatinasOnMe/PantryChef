@@ -12,6 +12,7 @@ import '../widgets/rating_dialog.dart';
 import '../widgets/serving_adjuster.dart';
 import '../widgets/nutrition_card.dart';
 import 'loading_screen.dart';
+import 'recipe_edit_screen.dart';
 
 class RecipeScreenEnhanced extends StatefulWidget {
   final Recipe recipe;
@@ -86,6 +87,32 @@ class _RecipeScreenEnhancedState extends State<RecipeScreenEnhanced> {
       _recipe.id,
       _checkedIngredients.toList(),
     );
+  }
+
+  Future<void> _editRecipe() async {
+    final editedRecipe = await Navigator.push<Recipe>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RecipeEditScreen(recipe: _recipe),
+      ),
+    );
+
+    if (editedRecipe != null) {
+      setState(() {
+        _recipe = editedRecipe;
+      });
+      
+      // Save updated recipe if it was saved
+      if (_recipe.isSaved) {
+        await _storageService.saveRecipe(_recipe);
+      }
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Recipe updated!')),
+        );
+      }
+    }
   }
 
   Future<void> _showRatingDialog() async {
@@ -260,6 +287,12 @@ class _RecipeScreenEnhancedState extends State<RecipeScreenEnhanced> {
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
+          // Edit button
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: _editRecipe,
+            tooltip: 'Edit recipe',
+          ),
           // Rating button
           IconButton(
             icon: Icon(

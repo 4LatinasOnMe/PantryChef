@@ -2,13 +2,111 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/recipe.dart';
 import '../config/api_config.dart';
+import 'recipe_cache_service.dart';
 
 class RecipeService {
+  final RecipeCacheService _cacheService = RecipeCacheService();
   static String get _apiKey => ApiConfig.openAiApiKey;
   static String get _model => ApiConfig.openAiModel;
   static const String _apiUrl = 'https://api.openai.com/v1/chat/completions';
+  static const int _maxRetries = 3;
+  static const Duration _retryDelay = Duration(seconds: 2);
 
   Future<List<Recipe>> generateMultipleRecipes({
+    required List<String> ingredients,
+    String? cuisineType,
+    List<String>? dietaryNeeds,
+    String? mealType,
+    String? cookingTime,
+    int count = 4,
+    bool useCache = true,
+  }) async {
+    // Try to get from cache first
+    if (useCache) {
+      final cacheKey = _cacheService.generateCacheKey(
+        ingredients,
+        cuisineType: cuisineType,
+        dietaryNeeds: dietaryNeeds,
+        mealType: mealType,
+      );
+      
+      final cachedRecipes = await _cacheService.getCachedRecipes(cacheKey);
+      if (cachedRecipes != null && cachedRecipes.isNotEmpty) {
+        print('Using cached recipes for: $cacheKey');
+        return cachedRecipes.take(count).toList();
+      }
+    }
+
+    // Generate new recipes
+    try {
+      final recipes = await _retryWithBackoff(() => _generateMultipleRecipesInternal(
+        ingredients: ingredients,
+        cuisineType: cuisineType,
+        dietaryNeeds: dietaryNeeds,
+        mealType: mealType,
+        cookingTime: cookingTime,
+        count: count,
+      ));
+
+      // Cache the results
+      if (useCache) {
+        final cacheKey = _cacheService.generateCacheKey(
+          ingredients,
+          cuisineType: cuisineType,
+          dietaryNeeds: dietaryNeeds,
+          mealType: mealType,
+        );
+        await _cacheService.cacheRecipes(recipes, cacheKey);
+      }
+
+      return recipes;
+    } catch (e) {
+      // If network fails, try to return any cached recipes even if expired
+      final cacheKey = _cacheService.generateCacheKey(
+        ingredients,
+        cuisineType: cuisineType,
+        dietaryNeeds: dietaryNeeds,
+        mealType: mealType,
+      );
+      
+      final cachedRecipes = await _cacheService.getCachedRecipes(cacheKey);
+      if (cachedRecipes != null && cachedRecipes.isNotEmpty) {
+        print('Network failed, using expired cache for: $cacheKey');
+        return cachedRecipes.take(count).toList();
+      }
+      
+      rethrow;
+    }
+  }
+
+  Future<T> _retryWithBackoff<T>(Future<T> Function() operation) async {
+    int attempt = 0;
+    Duration delay = _retryDelay;
+
+    while (attempt < _maxRetries) {
+      try {
+        return await operation();
+      } catch (e) {
+        attempt++;
+        if (attempt >= _maxRetries) {
+          rethrow;
+        }
+
+        // Don't retry on auth errors or invalid API key
+        if (e.toString().contains('401') || e.toString().contains('Invalid API key')) {
+          rethrow;
+        }
+
+        print('Attempt $attempt failed: $e. Retrying in ${delay.inSeconds}s...');
+        await Future.delayed(delay);
+        delay *= 2; // Exponential backoff
+      }
+    }
+
+    throw Exception('Max retries exceeded');
+  }
+
+  Future<List<Recipe>> _generateMultipleRecipesInternal({
     required List<String> ingredients,
     String? cuisineType,
     List<String>? dietaryNeeds,

@@ -14,6 +14,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
   final ShoppingListService _shoppingListService = ShoppingListService();
   List<ShoppingListItem> _items = [];
   bool _isLoading = true;
+  bool _aggregateMode = false;
 
   @override
   void initState() {
@@ -22,7 +23,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
   }
 
   Future<void> _loadItems() async {
-    final items = await _shoppingListService.getShoppingList();
+    final items = await _shoppingListService.getShoppingList(aggregate: _aggregateMode);
     if (mounted) {
       setState(() {
         _items = items;
@@ -149,6 +150,17 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
+          if (_items.isNotEmpty)
+            IconButton(
+              icon: Icon(_aggregateMode ? Icons.list : Icons.merge_type),
+              tooltip: _aggregateMode ? 'Show All Items' : 'Combine Quantities',
+              onPressed: () {
+                setState(() {
+                  _aggregateMode = !_aggregateMode;
+                });
+                _loadItems();
+              },
+            ),
           if (_items.isNotEmpty)
             PopupMenuButton<String>(
               onSelected: (value) {
