@@ -8,11 +8,43 @@ PantryChef helps you discover what to cook based on what you already have. Simpl
 
 ## Features
 
-- 🥘 **Smart Recipe Generation**: AI-powered recipes from your ingredients
-- 🎨 **Beautiful UI**: Clean, minimalist design with warm, appetizing aesthetics
-- 📖 **Personal Cookbook**: Save and organize your favorite recipes
-- ✅ **Interactive Cooking**: Check off ingredients and follow step-by-step instructions
-- 🔥 **Delightful Experience**: Engaging animations and cooking tips while you wait
+### 🤖 AI-Powered Recipe Generation
+- **Multiple Recipe Options**: Generate 3-10 recipes at once from your ingredients
+- **Multi-Cuisine Selection**: Choose multiple cuisine types (e.g., "Italian & Asian fusion")
+- **Multi-Meal Type**: Select multiple meal types (e.g., "Breakfast or Lunch")
+- **Cooking Time Filter**: Set time constraints (15 min to 90+ min)
+- **Dietary Preferences**: Multi-select dietary needs (Vegan, Gluten-Free, Keto, etc.)
+- **Smart Variations**: Get diverse recipes with different cooking methods and flavors
+
+### 📸 Visual Experience
+- **Beautiful Food Photos**: Auto-fetched from Unsplash for every recipe
+- **AI-Estimated Nutrition**: Calories, macros, fiber, sodium per serving
+- **Health Scoring**: Visual health indicators and dietary labels
+- **Allergen Detection**: Automatic allergen identification
+
+### 📖 Personal Cookbook
+- **Save Favorites**: Build your personal recipe collection
+- **Recipe Rating**: Rate and add notes to saved recipes
+- **Search & Filter**: Find recipes by name, cuisine, or dietary needs
+- **Recipe Variations**: Generate healthier/spicier/vegetarian versions
+
+### 🛒 Smart Meal Planning
+- **Weekly Meal Planner**: Drag-and-drop meal scheduling
+- **Shopping List**: Auto-generated from meal plans, grouped by recipe
+- **Smart Grouping**: Ingredients organized by recipe source
+- **Check-off System**: Track purchased items with visual feedback
+
+### 📊 Food Diary
+- **Meal Tracking**: Log breakfast, lunch, dinner, and snacks
+- **Photo Logging**: Add photos to meal entries
+- **Calorie Tracking**: Daily calorie monitoring
+- **Meal History**: View past meals and patterns
+
+### 🎨 Modern UI/UX
+- **Dark Mode**: Full dark theme support
+- **Responsive Design**: Works on all screen sizes
+- **Smooth Animations**: Delightful transitions and loading states
+- **Accessibility**: Screen reader support and high contrast
 
 ## Design Documentation
 
@@ -73,15 +105,23 @@ flutter run
 
 ### Required Packages
 
-Add these to `pubspec.yaml`:
+Key dependencies in `pubspec.yaml`:
 ```yaml
 dependencies:
   flutter:
     sdk: flutter
-  google_fonts: ^6.1.0        # Poppins font
-  flutter_svg: ^2.0.9         # SVG illustrations
-  lottie: ^3.0.0              # Loading animations
-  shared_preferences: ^2.2.2  # Local storage
+  
+  # Design & UI
+  google_fonts: ^6.1.0           # Poppins font
+  cached_network_image: ^3.3.1   # Image caching
+  
+  # State Management & Storage
+  shared_preferences: ^2.2.2     # Local storage
+  provider: ^6.1.1               # State management
+  
+  # API & Environment
+  http: ^1.1.0                   # HTTP requests
+  flutter_dotenv: ^5.1.0         # Environment variables
 ```
 
 ## Project Structure
@@ -89,29 +129,45 @@ dependencies:
 ```
 lib/
 ├── main.dart
+├── config/
+│   └── api_config.dart              # API key configuration
 ├── screens/
-│   ├── home_screen.dart
-│   ├── loading_screen.dart
-│   ├── recipe_screen.dart
-│   └── cookbook_screen.dart
+│   ├── welcome_screen.dart          # Onboarding
+│   ├── home_screen.dart             # Main input screen
+│   ├── loading_screen.dart          # Recipe generation
+│   ├── recipe_selection_screen.dart # Multiple recipe options
+│   ├── recipe_screen_enhanced.dart  # Recipe details
+│   ├── cookbook_screen_enhanced.dart# Saved recipes
+│   ├── meal_planning_screen.dart    # Weekly planner
+│   ├── shopping_list_screen.dart    # Shopping list
+│   └── food_diary_screen.dart       # Meal tracking
 ├── widgets/
-│   ├── ingredient_input.dart
-│   ├── preference_chips.dart
-│   ├── recipe_card.dart
-│   └── loading_animation.dart
+│   ├── recipe_card.dart             # Recipe preview cards
+│   ├── nutrition_card.dart          # Nutrition display
+│   ├── rating_dialog.dart           # Recipe rating
+│   └── meal_plan_calendar.dart      # Calendar widget
 ├── models/
-│   ├── recipe.dart
-│   └── ingredient.dart
+│   ├── recipe.dart                  # Recipe data model
+│   ├── nutrition_info.dart          # Nutrition data
+│   ├── meal_plan.dart               # Meal plan model
+│   ├── shopping_list_item.dart      # Shopping item
+│   └── food_diary_entry.dart        # Diary entry
 ├── services/
-│   ├── ai_service.dart
-│   └── storage_service.dart
+│   ├── recipe_service.dart          # OpenAI recipe generation
+│   ├── recipe_variation_service.dart# Recipe variations
+│   ├── nutrition_service.dart       # AI nutrition estimation
+│   ├── unsplash_service.dart        # Food photo fetching
+│   ├── cookbook_service.dart        # Local recipe storage
+│   ├── meal_plan_service.dart       # Meal planning
+│   ├── shopping_list_service.dart   # Shopping list
+│   └── food_diary_service.dart      # Diary tracking
+├── providers/
+│   └── theme_provider.dart          # Dark mode state
 └── theme/
-    └── app_theme.dart
+    └── app_theme.dart               # Design system
 
 assets/
-├── icons/
-├── animations/
-└── illustrations/
+└── .env                             # API keys (not committed)
 ```
 
 ## Development Roadmap
@@ -130,20 +186,30 @@ assets/
 - [x] Build Recipe Display screen
 - [x] Build Cookbook screen
 
-### Phase 3: Features & Integration ✅ (Partial)
-- [x] Mock recipe generation service (ready for AI API)
-- [x] Implement local storage for saved recipes
-- [x] Add ingredient checkbox persistence
-- [ ] Integrate real AI API for recipe generation
-- [ ] Implement search functionality
-- [ ] Add share functionality
+### Phase 3: Features & Integration ✅
+- [x] OpenAI API integration for recipe generation
+- [x] Multiple recipe generation (3-10 recipes at once)
+- [x] Unsplash API for food photography
+- [x] AI-powered nutrition estimation
+- [x] Local storage for saved recipes
+- [x] Recipe rating and notes system
+- [x] Recipe variation generation
+- [x] Search and filter functionality
+- [x] Meal planning system
+- [x] Shopping list with smart grouping
+- [x] Food diary with calorie tracking
 
-### Phase 4: Polish & Testing ✅ (Partial)
-- [x] Animations and transitions
+### Phase 4: Polish & Testing ✅
+- [x] Smooth animations and transitions
+- [x] Dark mode support
+- [x] Responsive design for all screen sizes
 - [x] Accessibility improvements
 - [x] Performance optimization
-- [ ] User testing and feedback
-- [ ] Bug fixes and refinements
+- [x] Error handling and network resilience
+- [x] Loading states and user feedback
+- [x] Multi-select preferences (cuisine, meal type)
+- [x] Cooking time filter
+- [x] Recipe count selection (3-10 recipes)
 
 ## Contributing
 
@@ -153,11 +219,24 @@ Contributions are welcome! Please read the design documentation before making UI
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
+## Technology Stack
+
+- **Framework**: Flutter 3.9+
+- **Language**: Dart
+- **AI**: OpenAI GPT-4o-mini for recipe generation and nutrition estimation
+- **Images**: Unsplash API for food photography
+- **Storage**: SharedPreferences for local data persistence
+- **State Management**: Provider pattern
+- **Fonts**: Google Fonts (Poppins)
+- **Architecture**: Service-based architecture with clean separation
+
 ## Acknowledgments
 
+- **OpenAI** for GPT-4o-mini API powering recipe generation
+- **Unsplash** for beautiful food photography
 - Design inspired by modern minimalist food apps
-- Icons from Material Icons and custom SVG illustrations
-- Animations powered by Lottie
+- Icons from Material Icons
+- Community feedback and testing
 
 ---
 
@@ -194,7 +273,24 @@ flutter run
 ```
 
 ### 4. Generate Recipes!
-Enter your ingredients and let AI create delicious recipes for you! 🍳
+
+**How to use:**
+1. Enter your available ingredients (comma-separated)
+2. Select preferences:
+   - **Multiple cuisines** (e.g., Italian + Asian)
+   - **Multiple meal types** (e.g., Lunch or Dinner)
+   - **Dietary needs** (Vegan, Gluten-Free, etc.)
+   - **Cooking time** (15 min to 90+ min)
+   - **Number of recipes** (3-10 options)
+3. Tap "Generate Recipes"
+4. Choose from multiple AI-generated options
+5. View full recipe with:
+   - Beautiful food photo
+   - AI-estimated nutrition facts
+   - Step-by-step instructions
+   - Ingredient checklist
+6. Save favorites to your cookbook
+7. Plan meals and generate shopping lists
 
 ---
 
@@ -210,11 +306,71 @@ This project uses environment variables to keep API keys secure:
 
 ---
 
-**Status**: OpenAI Integration Complete ✅ | Ready to Use 🚀
+## App Screenshots & Features
+
+### 🏠 Home Screen
+- Multi-select cuisine types (Italian, Asian, Mexican, etc.)
+- Multi-select meal types (Breakfast, Lunch, Dinner, etc.)
+- Multi-select dietary preferences (8 options)
+- Cooking time filter (15 min to 90+ min)
+- Recipe count selector (3-10 recipes)
+
+### 🎲 Recipe Selection
+- View 3-10 AI-generated recipe options at once
+- Each with photo, description, and key details
+- Tap any recipe to view full details
+
+### 📖 Recipe Details
+- Beautiful food photography
+- AI-estimated nutrition (calories, protein, carbs, fat)
+- Health score and dietary labels
+- Allergen warnings
+- Step-by-step instructions
+- Ingredient checklist
+- Save to cookbook
+- Generate variations (healthier, spicier, etc.)
+
+### 📚 Cookbook
+- All saved recipes in one place
+- Search by name
+- Filter by cuisine or dietary needs
+- Rate and add notes
+- Quick access to favorites
+
+### 📅 Meal Planner
+- Weekly calendar view
+- Drag-and-drop meal scheduling
+- Breakfast, lunch, dinner, snack slots
+- Generate shopping list from plan
+
+### 🛒 Shopping List
+- Auto-generated from meal plans
+- Grouped by recipe
+- Check-off system
+- Swipe to delete
+- Clear checked items
+
+### 📊 Food Diary
+- Log all meals with photos
+- Daily calorie tracking
+- Meal history
+- Visual progress tracking
+
+---
+
+**Status**: ✅ Production Ready | 🚀 Fully Functional
+
+**Key Features:**
+- ✅ Multi-recipe generation (3-10 at once)
+- ✅ Multi-select preferences
+- ✅ AI nutrition estimation
+- ✅ Beautiful food photos
+- ✅ Meal planning & shopping lists
+- ✅ Food diary with calorie tracking
+- ✅ Dark mode support
+- ✅ Offline recipe storage
 
 **Documentation:**
-- [OpenAI Setup Guide](OPENAI_SETUP.md) - **START HERE** - Add your API key
-- [API Integration Summary](API_INTEGRATION_SUMMARY.md) - Quick overview
+- [OpenAI Setup Guide](OPENAI_SETUP.md) - API key setup
 - [Getting Started Guide](GETTING_STARTED.md) - App usage
-- [Implementation Summary](IMPLEMENTATION_COMPLETE.md) - Complete feature list
 - [Design Overview](DESIGN_OVERVIEW.md) - Design specifications
